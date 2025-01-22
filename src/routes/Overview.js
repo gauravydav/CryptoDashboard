@@ -1,20 +1,20 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAssets } from '../redux/slices/cryptoSlice';
+import { Button, Typography } from '@mui/material';
+import axios from 'axios';
 
 const Overview = () => {
-  const overviewData = useSelector(state => state.crypto.overview);
+    const dispatch = useDispatch();
+   
 
-  return (
-    <div className="p-4">
-      <h2 className="text-xl">Overview</h2>
-      <div className="my-4">
-        <p>Market Cap: {overviewData.marketCap}</p>
-        <p>Rank: {overviewData.rank}</p>
-        <p>Circulating Supply: {overviewData.supply}</p>
-        <p>Description: {overviewData.description}</p>
-      </div>
-    </div>
-  );
+    return (
+        <div>
+            <Typography variant="h3" gutterBottom>
+                Cryptocurrency Overview
+            </Typography>
+        </div>
+    );
 };
 
 export default Overview;
