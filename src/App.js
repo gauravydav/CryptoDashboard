@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Dashboard from './routes/Dashboard';
-import Overview from './routes/Overview';
-import History from './routes/History';
+import Dashboard from './components/routes/Dashboard';
+import Overview from './components/routes/Overview';
+import History from './components/routes/History';
 
 const App = () => {
     return (
