@@ -1,46 +1,110 @@
-# Getting Started with Create React App and Redux
+# Real-Time Cryptocurrency Dashboard with Routing and Overview Feature
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+## Objective:
+The goal of this project is to develop a responsive web application that displays real-time and historical data for selected cryptocurrencies using React, Redux, and Chart.js. The app includes multiple routes for easier navigation, featuring a cryptocurrency dashboard, an overview page, and a history page.
 
-## Available Scripts
+## Assignment Deliverables:
 
-In the project directory, you can run:
+### Functional Requirements:
 
-### `npm start`
+#### 1. Dashboard Layout:
+- **Header:**
+  - Title of the application.
+  - Dropdown menu to select a cryptocurrency (e.g., Bitcoin, Ethereum).
+  - Navigation menu with links to:
+    - Dashboard
+    - Overview
+    - History
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Main Routes:**
+  - **Dashboard Route:**
+    - **Current Price Display:** Show the current price of the selected cryptocurrency.
+    - Display the percentage change over the last 24 hours.
+    - **Historical Data Chart:** Line chart using Chart.js to visualize the price trend over the past 7 days.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  - **Overview Route:**
+    - Display key details about the selected cryptocurrency, such as:
+      - Market Cap
+      - Total Supply
+      - Circulating Supply
+      - All-time High price
+      - Rank
+    - Include a brief description of the cryptocurrency's purpose and usage.
 
-### `npm test`
+  - **History Route:**
+    - Table showing historical price data (price, date, and 24-hour volume).
+    - Include a search or filter option to refine the data.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Footer:**
+  - Display the last updated time.
 
-### `npm run build`
+### Routing Setup:
+Use **React Router** to define the following routes:
+1. `/dashboard`: Default route displaying the main cryptocurrency dashboard.
+2. `/overview`: Displays detailed information about the selected cryptocurrency.
+3. `/history`: Displays historical data in a tabular format.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### State Management:
+Use **Redux** to manage:
+1. **Selected Cryptocurrency:** Current selection made via dropdown.
+2. **Price Data:** Current price and percentage change.
+3. **Historical Data:** 7-day price history.
+4. **Overview Data:** Market cap, supply details, rank, and description.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Data Fetching:
+1. **Current Price:**
+   - Fetch the current price and 24-hour percentage change using the **COINCAP API** or **CoinGecko API**.
+2. **Historical Data:**
+   - Retrieve the past 7 days of price history for the selected cryptocurrency.
+3. **Overview Data:**
+   - Fetch detailed information like market cap, supply details, rank, and a brief description.
+4. **Optional Real-Time Updates:**
+   - Use **WebSocket** integration to receive live price updates.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Features and Functionality:
 
-### `npm run eject`
+#### Routes and Navigation:
+1. **Dashboard:**
+   - Displays live data and a historical chart.
+   - Dropdown to select a cryptocurrency.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. **Overview:**
+   - Shows details and a description of the selected cryptocurrency.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. **History:**
+   - Displays a tabular view of historical data with filtering/search options.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### User Interactions:
+1. **Dropdown Selection:** Dynamically updates the dashboard and other views.
+2. **Navigation:** Smooth navigation between routes using React Router.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Styling and Design:
+1. Responsive design for both desktop and mobile.
+2. Used a **TailwindCSS**
+3. Smooth transitions between routes.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Clone this repository:
+To get started with this project, clone the repository:
+
+```bash
+git clone https://github.com/gauravydav/CryptoDashboard.git
+cd CryptoDashboard
+ ```
+
+ 1:Install dependecies 
+
+  ```bash
+  npm install
+  ```
+
+
+  2:Start the development server.
+   ```bash
+   npm start
+   ```
+
+## Thankyou
+
+
