@@ -1,81 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchHistoricalData, fetchPriceChange24h, setSelectedAsset } from '../../redux/slices/cryptoSlice';
 import { createPriceSocket } from '../../services/websocket';
-import axios from 'axios';
 import Header from '../Header';
 import Footer from '../Footer';
 import PriceChart from '../PriceChart';
-import { setPriceData, fallbackToCachedData } from '../../redux/slices/cryptoSlice';
-
 
 const Dashboard = () => {
     const dispatch = useDispatch();
     const assets = ['bitcoin', 'ethereum', 'monero', 'litecoin'];
-    const [selectedAsset, setSelectedAsset] = useState('bitcoin');
-    const [priceChange24h, setPriceChange24h] = useState(null);
-    const [priceHistory, setPriceHistory] = useState([]);
     const [lastUpdated, setLastUpdated] = useState(null);
 
-    const priceData = useSelector((state) => state.crypto.priceData[selectedAsset]);
-
-    const fetchPriceChange24h = async (asset) => {
-        try {
-            const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${asset}`);
-            const data = response.data.market_data;
-            const change = data.price_change_percentage_24h_in_currency.usd;
-            setPriceChange24h(change);
-        } catch (error) {
-            console.error('Error fetching 24h price change:', error);
-            dispatch(fallbackToCachedData(asset)); 
-        }
-    };
-    
-
-    const fetchPriceHistory = async (asset) => {
-        try {
-            const response = await axios.get(
-                `https://api.coingecko.com/api/v3/coins/${asset}/market_chart`,
-                {
-                    params: { vs_currency: 'usd', days: 7 },
-                }
-            );
-            const history = response.data.prices.map(([timestamp, price]) => ({
-                time: new Date(timestamp).toLocaleDateString(),
-                price,
-            }));
-            setPriceHistory(history);
-        } catch (error) {
-            console.error('Error fetching price history:', error);
-        }
-    };
-
-    const updateLastUpdated = () => {
-        setLastUpdated(new Date().toLocaleString());
-    };
+    const selectedAsset = useSelector(state => state.crypto.selectedAsset);
+    const priceData = useSelector(state => state.crypto.priceData[selectedAsset]);
+    const historicalData = useSelector(state => state.crypto.historicalData[selectedAsset]);
+    const priceChange24h = useSelector(state => state.crypto.priceChange24h[selectedAsset]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            fetchPriceChange24h(selectedAsset);
-            fetchPriceHistory(selectedAsset);
-            updateLastUpdated();
-        }, 2000);
-
-        return () => clearInterval(interval);
-    }, [selectedAsset]);
+        dispatch(fetchHistoricalData(selectedAsset));
+        dispatch(fetchPriceChange24h(selectedAsset)); 
+        setLastUpdated(new Date().toLocaleString());
+    }, [dispatch, selectedAsset]);
 
     useEffect(() => {
         createPriceSocket(assets, dispatch);
-
-        return () => {
-            console.log('Cleanup WebSocket connection');
-        };
-    }, []);
+    }, [dispatch]);
 
     return (
         <div className="container mx-auto px-4 py-6">
             <Header
                 selectedAsset={selectedAsset}
-                setSelectedAsset={setSelectedAsset}
+                setSelectedAsset={(asset) => dispatch(setSelectedAsset(asset))}
                 assets={assets}
             />
             <main className="mt-8">
@@ -85,22 +40,23 @@ const Dashboard = () => {
                         <div className="flex justify-between">
                             <span className="text-lg font-medium">Current Price:</span>
                             <span className="text-lg">
-                                {priceData !== undefined ? `$${priceData}` : 'No recent data'}
+                                {priceData ? `$${priceData}` : 'No recent data'}
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-lg font-medium">24h Change:</span>
-                            <span
-                                className={`text-lg ${
-                                    priceChange24h < 0 ? 'text-red-500' : 'text-green-500'
-                                }`}
-                            >
-                                {priceChange24h !== null ? `${priceChange24h.toFixed(2)}%` : 'Not available'}
+                            <span className="text-lg font-medium">24h Price Change:</span>
+                            <span className="text-lg">
+                                {priceChange24h !== undefined ? `${priceChange24h.toFixed(2)}%` : 'No data available'}
                             </span>
                         </div>
                     </div>
                 </div>
-                <PriceChart priceHistory={priceHistory} />
+
+                {historicalData && historicalData.length > 0 ? (
+                    <PriceChart priceHistory={historicalData} />
+                ) : (
+                    <div>No historical data available.</div>
+                )}
             </main>
             <Footer lastUpdated={lastUpdated} />
         </div>

@@ -1,53 +1,118 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+export const fetchPriceChange24h = createAsyncThunk(
+    'crypto/fetchPriceChange24h',
+    async (asset) => {
+        try {
+            const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${asset}`);
+            const data = response.data.market_data;
+            return data.price_change_percentage_24h;  
+        } catch (error) {
+            console.error('Error fetching 24h price change:', error);
+            return null;
+        }
+    }
+);
+
+export const fetchPriceData = createAsyncThunk(
+    'crypto/fetchPriceData',
+    async (asset) => {
+        const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${asset}`);
+        return response.data.market_data;
+    }
+);
+
+export const fetchHistoricalData = createAsyncThunk(
+    'crypto/fetchHistoricalData',
+    async (asset) => {
+        const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${asset}/market_chart`, {
+            params: { vs_currency: 'usd', days: 7 },
+        });
+
+        return response.data.prices.map((priceEntry, index) => {
+            const [timestamp, price] = priceEntry;
+            const volume = response.data.total_volumes[index][1]; 
+            return {
+                time: new Date(timestamp).toLocaleDateString(),
+                price,
+                volume,
+            };
+        });
+    }
+);
+
+
+export const fetchOverviewData = (selectedAsset) => async (dispatch) => {
+    try {
+        const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${selectedAsset}`);
+        const data = response.data;
+
+        if (data && data.market_data) {
+            const overview = {
+                marketCap: data.market_data.market_cap.usd,
+                totalSupply: data.market_data.total_supply,
+                circulatingSupply: data.market_data.circulating_supply,
+                allTimeHigh: data.market_data.ath.usd,
+                rank: data.market_cap_rank,
+                description: data.description.en,
+            };
+
+            console.log('Fetched Overview Data:', overview);
+            dispatch(setOverviewData(overview));
+        } else {
+            console.log('No market data available for asset:', selectedAsset);
+        }
+    } catch (error) {
+        console.error('Error fetching cryptocurrency data:', error);
+    }
+};
 
 const initialState = {
-    assets: [],  // Array to store the available assets (e.g., 'bitcoin', 'ethereum', etc.)
-    priceData: {},  // Object to store the live price data of assets
-    cachedPriceData: {},  // Cache to store price data temporarily
-    selectedAsset: 'bitcoin',  // Default selected asset (could be 'bitcoin' or any other)
-    overviewData: {},  // New state to store the selected asset's overview data
-    historicalData: {},  // New state for storing historical data of the selected asset
+    assets: ['bitcoin', 'ethereum', 'monero', 'litecoin'],  
+    priceData: {},  
+    selectedAsset: 'bitcoin',  
+    overviewData: {}, 
+    historicalData: {}, 
+    priceChange24h: {},  
 };
 
 const cryptoSlice = createSlice({
     name: 'crypto',
     initialState,
     reducers: {
-        setAssets: (state, action) => {
-            state.assets = action.payload;  // Set the list of available assets
+        setSelectedAsset: (state, action) => {
+            state.selectedAsset = action.payload;
         },
         setPriceData: (state, action) => {
-            const priceData = action.payload;
-            for (const asset in priceData) {
-                state.priceData[asset] = priceData[asset];  // Update live price data
-                state.cachedPriceData[asset] = priceData[asset];  // Cache price data for fallback
-            }
-        },
-        setSelectedAsset: (state, action) => {
-            state.selectedAsset = action.payload;  // Set the selected asset
-        },
-        fallbackToCachedData: (state, action) => {
-            const asset = action.payload;
-            if (state.cachedPriceData[asset]) {
-                state.priceData[asset] = state.cachedPriceData[asset];  // Fall back to cached data if available
-            }
+            state.priceData = { ...state.priceData, ...action.payload };  
+            // console.log('State after setting price data:', state.priceData);
         },
         setOverviewData: (state, action) => {
-            state.overviewData = action.payload;  // Set the overview data for the selected asset
+            state.overviewData = action.payload;
+            // console.log('State after setting overview data:', state.overviewData);
         },
-        setHistoricalData: (state, action) => {
-            state.historicalData = action.payload;  // Set the historical data for the selected asset
-        },
+    },
+    extraReducers: (builder) => {
+        builder
+        .addCase(fetchPriceChange24h.fulfilled, (state, action) => {
+            if (action.payload !== null) {
+                state.priceChange24h[state.selectedAsset] = action.payload;
+            } else {
+                console.error('Error fetching 24h price change data.');
+            }
+        })
+        .addCase(fetchHistoricalData.fulfilled, (state, action) => {
+            state.historicalData[state.selectedAsset] = action.payload;
+            // console.log('State after setting historical data:', state.historicalData);
+        });
     },
 });
 
 export const {
-    setAssets,
-    setPriceData,
+    setPriceData, 
     setSelectedAsset,
-    fallbackToCachedData,
     setOverviewData,
-    setHistoricalData
 } = cryptoSlice.actions;
 
 export default cryptoSlice.reducer;

@@ -2,24 +2,28 @@ import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-// Register necessary components from Chart.js
+
 ChartJS.register(
-    CategoryScale,  // For the x-axis with categories
-    LinearScale,    // For the y-axis with linear scaling
-    PointElement,   // For the point elements (circle dots on the line)
-    LineElement,    // For the line itself
-    Title,          // For chart title
-    Tooltip,        // For tooltips
-    Legend          // For legend
+    CategoryScale,  
+    LinearScale, 
+    PointElement,   
+    LineElement,    
+    Title,          
+    Tooltip,        
+    Legend         
 );
 
 const PriceChart = ({ priceHistory }) => {
+    if (!priceHistory || priceHistory.length === 0) {
+        return <div>No historical data available.</div>;  
+    }
+
     const chartData = {
-        labels: priceHistory.map((entry) => entry.time), // Assuming 'time' is the timestamp or date
+        labels: priceHistory.map((entry) => entry.time), 
         datasets: [
             {
                 label: 'Price Trend (Last 7 Days)',
-                data: priceHistory.map((entry) => entry.price), // Assuming 'price' is the value
+                data: priceHistory.map((entry) => entry.price),
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1,
             },

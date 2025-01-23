@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 const Header = ({ selectedAsset, setSelectedAsset, assets }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const location = useLocation();  
 
-    // Handle dropdown clicks outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -21,6 +21,9 @@ const Header = ({ selectedAsset, setSelectedAsset, assets }) => {
 
     const assetName = selectedAsset ? selectedAsset.charAt(0).toUpperCase() + selectedAsset.slice(1) : 'Loading...';
 
+     const isDashboard = location.pathname === '/';
+     const isOverview = location.pathname === '/overview';
+     const isHistory = location.pathname === '/history';
     return (
         <header className="flex justify-between items-center bg-gray-800 text-white p-4 rounded-lg shadow-xl">
             <h1 className="text-3xl font-semibold">Cryptocurrency Dashboard</h1>
@@ -51,9 +54,9 @@ const Header = ({ selectedAsset, setSelectedAsset, assets }) => {
             </div>
 
             <nav className="space-x-4">
-                <Link to="/" className="text-white hover:text-blue-400 transition duration-200">Dashboard</Link>
-                <Link to="/overview" className="text-white hover:text-blue-400 transition duration-200">Overview</Link>
-                <Link to="/history" className="text-white hover:text-blue-400 transition duration-200">History</Link>
+                {!isDashboard && <Link to="/" className="text-white hover:text-blue-400 transition duration-200">Dashboard</Link>}
+                {!isOverview && <Link to="/overview" className="text-white hover:text-blue-400 transition duration-200">Overview</Link>}
+                {!isHistory && <Link to="/history" className="text-white hover:text-blue-400 transition duration-200">History</Link>}
             </nav>
         </header>
     );
