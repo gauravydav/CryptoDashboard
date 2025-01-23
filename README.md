@@ -53,7 +53,7 @@ Use **Redux** to manage:
 
 ### Data Fetching:
 1. **Current Price:**
-   - Fetch the current price and 24-hour percentage change using the **COINCAP API** or **CoinGecko API**.
+   - Fetch the current price and 24-hour percentage change using the **CoinGecko API**.
 2. **Historical Data:**
    - Retrieve the past 7 days of price history for the selected cryptocurrency.
 3. **Overview Data:**
